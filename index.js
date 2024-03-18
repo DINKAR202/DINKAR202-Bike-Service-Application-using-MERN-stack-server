@@ -1,45 +1,51 @@
-const express = require("express");  // Import the Express framework.
-const bodyParser = require("body-parser");  // Import the body-parser middleware.
-const MongoClient = require("mongodb").MongoClient;  // Import the MongoDB client.
-const cors = require("cors");  // Import the CORS middleware.
-const { ObjectID, ObjectId } = require("bson");  // Import ObjectID from BSON.
-const app = express();  // Create an Express application.
-require("dotenv").config();  // Load environment variables from a .env file.
+const express = require("express"); // Import the Express framework.
+const bodyParser = require("body-parser"); // Import the body-parser middleware.
+const MongoClient = require("mongodb").MongoClient; // Import the MongoDB client.
+const cors = require("cors"); // Import the CORS middleware.
+const { ObjectID, ObjectId } = require("bson"); // Import ObjectID from BSON.
+const app = express(); // Create an Express application.
+require("dotenv").config(); // Load environment variables from a .env file.
 
-const stripe = require('stripe')("sk_test_51O04DQSA2KZxfmUNXNSL73gDKp8n6EWevOymCHzihmORmjkgzZ19i1eODQPoycehevLiWzOHGcvTZNM9VL1lBNBH00EXEFkZAA");  // Import and configure Stripe.
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
-const port = process.env.PORT || 5000;  // Define the port for the application, using an environment variable or 5000 as the default.
+const port = process.env.PORT || 5000; // Define the port for the application, using an environment variable or 5000 as the default.
 
-app.use(cors());  // Enable CORS for the Express app.
-app.use(bodyParser.json());  // Parse JSON request bodies.
+app.use(cors()); // Enable CORS for the Express app.
+app.use(bodyParser.json()); // Parse JSON request bodies.
 
-// Database connection
-const uri = `mongodb+srv://rathordinkar5:RhIQir6T7q8c4lDv@cluster2.yfml3ym.mongodb.net/?retryWrites=true&w=majority&appName=Cluster2`;  // Define the MongoDB connection string.
+// Extracting MongoDB URI and other variables from .env
+const {
+  MONGODB_URI
+} = process.env;
+
+// Constructing the MongoDB URI using the extracted variables
+const uri = MONGODB_URI;
+
 
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 
-client.connect(err => {
+client.connect((err) => {
   if (err) {
-    console.error('Database connection failed:', err);
+    console.error("Database connection failed:", err);
   } else {
-    console.log('Database connected successfully');
+    console.log("Database connected successfully");
   }
 
   const serviceCollection = client
     .db(`${process.env.DB_NAME}`)
-    .collection("services");  // Define a collection for services.
+    .collection("services"); // Define a collection for services.
   const reviewCollection = client
     .db(`${process.env.DB_NAME}`)
-    .collection("reviews");  // Define a collection for reviews.
+    .collection("reviews"); // Define a collection for reviews.
   const adminsCollection = client
     .db(`${process.env.DB_NAME}`)
-    .collection("admins");  // Define a collection for admins.
+    .collection("admins"); // Define a collection for admins.
   const orderCollection = client
     .db(`${process.env.DB_NAME}`)
-    .collection("orders");  // Define a collection for orders.
+    .collection("orders"); // Define a collection for orders.
 
   // Define API endpoints for adding services, reviews, orders, and admins.
 
